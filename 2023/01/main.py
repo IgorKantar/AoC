@@ -1,5 +1,11 @@
+# this is my first AoC puzzle, i could have
+# done alot of things better
+# after i finished i saw others using regex for
+# finding words, but i dont know how to do that
+# regex is scary
+
 import re
-# 53 868
+
 VALID_NUMBERS = {
     "one":   1,
     "two":   2,
@@ -40,33 +46,42 @@ def get_digit(s: str, reverse=False):
 sum_ = 0
 first_num = 0
 last_num  = 0
-x = 0
+
 with open("input.txt") as f:
     lines = f.readlines()
+    # list of tuples that represent
+    # (start_index, number_value)
     num_tuple_list = []
     for line in lines:
         reversed_ = line[:-1][::-1]
+        # get first digit
         front_dig = get_digit(line)
+        # get last digit
         end_dig  = get_digit(reversed_, reverse=True)
+        # get first and last word numbers
         first_w, last_w = get_str(line)
+        # append existing numbers and word numbers to list
         if front_dig: num_tuple_list.append(front_dig)
         if end_dig: num_tuple_list.append(end_dig)
         if first_w: num_tuple_list.append(first_w)
         if last_w: num_tuple_list.append(last_w)
+        # find starting indexes of first and last num
         first_ind = min(num_tuple_list)[0]
         last_ind  = max(num_tuple_list)[0]
+        # set tuple numeric values for mix and max index
+        # for later addition to sum
         for num in num_tuple_list:
             if first_ind == num[0]:
                 first_num = num[1]
                 continue
             elif last_ind == num[0]:
                 last_num = num[1]
+        # hmm this doesnt look too good
         if first_ind == last_ind:
-            a = first_num * 10 + first_num
-            sum_ += a
+            sum_ += first_num * 10 + first_num
         else:
-            a = first_num * 10 + last_num
-            sum_ += a
+            sum_ += first_num * 10 + last_num
+        # empty list for next iteration
         num_tuple_list = []
 
 print(sum_)
