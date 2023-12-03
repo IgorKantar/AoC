@@ -1,4 +1,3 @@
-SYMBOLS = ["`","~","!","@","#","$","%","^","&","*","(",")","-","_","=","+","/",",","[","]","{","}","\\", "|","'","\"",";",":","<",">","?"]
 import re
 
 class Element():
@@ -19,11 +18,9 @@ class Lines():
     def check(self):
         for star in self.sym_ind_list:
             self.check_circle(star)
-        # print(self.added_numbers)
 
     def check_circle(self, star: Element):
         first, second, third = self.get_rows(star.row)
-        # print(first)
         self.check_row(first, star)
         self.check_row(second, star)
         self.check_row(third, star)
@@ -32,9 +29,7 @@ class Lines():
         for num in num_row:
             for i in [star.index-1,star.index,star.index+1]:
                 if i in num.index:
-                    # print(num)
                     if num not in self.added_numbers:
-                        # print(num)
                         self.added_numbers.append(num)
 
     def get_numbers(self):
@@ -82,13 +77,12 @@ def get_indexes(start, len_):
     return [i for i in range(start, start+len_)]
 
 def add_number(el: Element) -> list:
-    # if multiple umbers stuck togetehr by star
+    # if multiple numbers stuck together by star
     multi_string = False
     if "*" in el.string:
         multi_string = el.string.split("*")[1]
     if multi_string:
         first_num  = el.string.split("*")[0]
-        # print(f"el: {el} first: {first_num} multi: {multi_string}")
         second_num = el.string.split("*")[1]
         result_list = []
         if first_num:
@@ -97,13 +91,9 @@ def add_number(el: Element) -> list:
         if second_num:
             second_el = Element(el.row, get_indexes(el.index+len(first_num)+1, len(second_num)), second_num)
             result_list.append(second_el)
-        if el.row == 137:
-            print(f"FAS: {result_list}")
         return result_list
     else:
         s = el.string.replace("*", "")
-        if el.row == 137:
-            print(f"FAS: {Element(el.row, get_indexes(el.index, len(s)), s)}")
         return [Element(el.row, get_indexes(el.index, len(s)), s)]
 
 def parse_file(lines):
@@ -117,27 +107,16 @@ def parse_file(lines):
         index_list = fix_indexes(index_list)
         star_indexes = split_stars(id_, index_list)
         last_el_len = 0
-        # print(re.split("[.-]", line))
         for i,s in enumerate(re.split("[.-]", line)):
             if s:
                 i += last_el_len
                 if s != "*":
                     number_indexes.extend(add_number(Element(id_, i, s)))
                 last_el_len += len(s)
-        # print(number_indexes)
-        # print(star_indexes)
         my_class.num_ind_list.extend(number_indexes)
-        # print(my_class.num_ind_list)
         my_class.sym_ind_list.extend(star_indexes)
-        # print(my_class.sym_ind_list)
 
     my_class.check()
-    x = [(n.row, n.string) for n in my_class.added_numbers]
-    x = sorted(x, key=lambda n: n[0])
-    # for y in my_class.num_ind_list:
-    #     if y.row == 139:
-    #         print(y)
-    # print(x)
     print(my_class.get_numbers())
 
 def solution() -> int:
