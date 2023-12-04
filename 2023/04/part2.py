@@ -1,7 +1,8 @@
 import re
 
 class Card():
-    def __init__(self, winning:list[int], have:list[int]) -> None:
+    def __init__(self, row_id: int, winning:list[int], have:list[int]) -> None:
+        self.row_id  = row_id
         self.winning = winning
         self.having  = have
         self.have_win = self.get_winning()
@@ -38,6 +39,26 @@ class Pile():
 
         return point_sum
 
+    def recursion(self, cards: list[Card]) -> list:
+        if not cards:
+            return []
+        copy_card_list = []
+        for card in cards:
+            if card.have_win:
+                start = card.row_id+1
+                end = start + len(card.have_win)
+                if end > len(self.cards):
+                    end = len(self.cards)
+                copy_card_list.extend(self.get_copies(start, end))
+        return copy_card_list + self.recursion(copy_card_list)
+
+    def get_total_cards(self) -> int:
+        all_copies = self.recursion(self.cards)
+        return len(self.cards) + len(all_copies)
+
+    def get_copies(self, start: int, end: int):
+        return [self.cards[i] for i in range(start, end)]
+
 def get_lines() -> list:
     # return list of lines
     with open("input.txt") as f:
@@ -46,7 +67,7 @@ def get_lines() -> list:
 look_behind = "(?<=:)[^\]]+"
 digits = "\d+"
 
-def parse(card: str) -> Card:
+def parse(row_id: int, card: str) -> Card:
     number_str = re.findall(look_behind, card)[0]
     win_str, have_str = number_str.split(" | ")
     win_str  = win_str.strip()
@@ -56,15 +77,16 @@ def parse(card: str) -> Card:
     win_nums  = [int(s) for s in win_nums]
     have_nums = [int(s) for s in have_nums]
 
-    return Card(win_nums, have_nums)
+    return Card(row_id, win_nums, have_nums)
 
 def solution() -> int:
     pile  = Pile()
     lines = get_lines()
-    for line in lines:
-        card = parse(line)
+    for i, line in enumerate(lines):
+        card = parse(i, line)
         pile.add_card(card)
-    return pile.get_points()
+    total_cards = pile.get_total_cards()
+    return total_cards
 
 if __name__ == "__main__":
     result = solution()
